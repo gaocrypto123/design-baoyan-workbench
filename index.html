@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>设计保研工作台 · 大一大二大三都能用</title>
+<style>
+:root{
+  --bg:#F2F5F9; --card:#FFFFFF; --ink:#22333F; --ink2:#6B7F8F; --ink3:#9BAAB6;
+  --line:#E1E8EF; --blue:#6E8CA0; --blue-d:#4A6B80; --blue-l:#E7EEF4; --blue-m:#A9BFCE;
+  --green:#5E8C6A; --amber:#B58B3F; --red:#A85A55;
+  --serif:"Noto Serif SC","Songti SC","STSong","SimSun",Georgia,serif;
+  --sans:"PingFang SC","Microsoft YaHei","Heiti SC",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 60px}
+h1,h2,h3,.num{font-family:var(--serif);font-weight:600}
+h1{font-size:26px;margin:0}
+h2{font-size:19px;margin:0 0 4px}
+h3{font-size:15px;margin:0 0 10px}
+p{margin:0 0 8px}
+a{color:var(--blue-d)}
+/* top */
+.topbar{background:linear-gradient(180deg,#DCE6EE 0%,#EAF0F5 100%);border-bottom:1px solid var(--line)}
+.topbar .wrap{padding-top:22px;padding-bottom:16px}
+.brow{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.badge{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:500;color:#fff;background:var(--blue-d);border-radius:20px;padding:3px 12px;letter-spacing:.5px}
+.sub{color:var(--ink2);font-size:13px;margin-top:6px}
+.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+button{font-family:var(--sans);font-size:13px;cursor:pointer;border:1px solid var(--blue-m);background:#fff;color:var(--blue-d);border-radius:8px;padding:7px 13px;transition:.15s}
+button:hover{background:var(--blue-l);border-color:var(--blue)}
+button.pri{background:var(--blue-d);color:#fff;border-color:var(--blue-d)}
+button.pri:hover{background:#3C5A6C}
+button.sm{padding:4px 9px;font-size:12px}
+.danger{border-color:#D9C3C1;color:var(--red)}
+.danger:hover{background:#FBEFEE}
+/* tabs */
+.tabs{position:sticky;top:0;z-index:9;background:rgba(242,245,249,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:4px;padding-top:10px;padding-bottom:10px;overflow-x:auto}
+.tab{border:none;background:transparent;color:var(--ink2);padding:8px 15px;border-radius:8px;font-size:14px;white-space:nowrap}
+.tab:hover{background:var(--blue-l);color:var(--blue-d)}
+.tab.on{background:var(--blue-d);color:#fff}
+/* card */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0}
+.card>h2{border-left:4px solid var(--blue-d);padding-left:10px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:820px){.g2,.g3,.g4{grid-template-columns:1fr}}
+/* metric */
+.metric{background:#FAFCFE;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.metric .lb{font-size:12px;color:var(--ink2);letter-spacing:.5px}
+.metric .vl{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.2;margin-top:2px}
+.metric .un{font-size:13px;color:var(--ink3);font-family:var(--sans)}
+/* quote */
+.quote{background:var(--blue-l);border-left:4px solid var(--blue-d);border-radius:0 10px 10px 0;padding:14px 18px;font-family:var(--serif);font-size:17px;color:#2F4A5C;margin:14px 0}
+.quote small{display:block;font-family:var(--sans);font-size:12px;color:var(--ink2);margin-top:6px;font-weight:400}
+/* form */
+label.f{display:block}
+label.f .t{display:block;font-size:12px;color:var(--ink2);margin-bottom:4px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue-m);outline-offset:0;border-color:var(--blue)}
+textarea{min-height:60px;resize:vertical}
+.field{display:flex;flex-direction:column}
+/* table */
+.tb{width:100%;border-collapse:collapse;font-size:13px}
+.tb th{text-align:left;font-weight:500;color:var(--ink2);font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tb td{padding:5px 8px;border-bottom:1px solid #F0F4F8;vertical-align:top}
+.tb td input,.tb td select{padding:5px 8px}
+.tb .r{width:74px}
+.tb .r2{width:96px}
+.tbwrap{overflow-x:auto}
+.delete{border:none;background:transparent;color:var(--ink3);padding:4px 6px;font-size:15px;line-height:1}
+.delete:hover{color:var(--red);background:transparent}
+/* ring */
+.ring{width:132px;height:132px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto}
+.ring .n{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1}
+.ring .l{font-size:12px;color:var(--ink2);margin-top:4px}
+/* bar */
+.bar{height:9px;background:#EAEFF4;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:6px}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #EDF1F5}
+.kv:last-child{border:none}
+.kv b{font-weight:500}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;background:var(--blue-l);color:var(--blue-d)}
+.pill.ok{background:#E7F0E9;color:#3F6B4C}
+.pill.warn{background:#F6EEDC;color:#8A6A2C}
+.pill.bad{background:#F7E7E5;color:#8E4A45}
+.note{font-size:12px;color:var(--ink2);background:#F7F9FB;border-radius:8px;padding:9px 12px;margin-top:10px}
+.sep{height:1px;background:var(--line);margin:18px 0}
+ul.ck{list-style:none;margin:0;padding:0}
+ul.ck li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #F0F4F8;align-items:flex-start}
+ul.ck li:last-child{border:none}
+ul.ck input{margin-top:4px;width:15px;height:15px;accent-color:var(--blue-d);flex:none}
+ul.ck span{flex:1}
+.chk-ok{color:var(--ink3);text-decoration:line-through}
+footer{color:var(--ink3);font-size:12px;text-align:center;padding:10px 0 0}
+.hint{font-size:12px;color:var(--ink2)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+@media print{
+  .tabs,.actions,.addrow,.delete,.no-print{display:none!important}
+  .card{break-inside:avoid;border-color:#DDD}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brow">
+      <div>
+        <span class="badge">设计类 · 保研自我管理</span>
+        <h1 style="margin-top:10px">设计保研工作台</h1>
+        <p class="sub">大一大二大三都能用 · 录入你自己的成绩、竞赛、作品集、科研，自动算出你离保研还差多少</p>
+      </div>
+      <div class="actions no-print">
+        <button class="pri" onclick="loadPreset('nfu')">载入政策模板</button>
+        <button class="pri" onclick="loadPreset('blank')">清空为空白</button>
+        <button onclick="loadDemo()">看示例数据</button>
+        <button onclick="clearAll()">清空我的数据</button>
+        <button onclick="exportJSON()">备份 JSON</button>
+        <button onclick="window.print()">打印 / 存 PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs"><div class="wrap" id="tabbar"></div></nav>
+
+<div class="wrap"><div id="app"></div>
+<footer>规则仅作估算参考，一切以你本校当年《推免工作实施办法》为准 · 数据只存在你自己浏览器里，不上传</footer>
+</div>
+
+<script>
+/* ============ 状态 ============ */
+var KEY='sheyi_baoyan_workbench_v1';
+var uid=(function(){var i=0;return function(){return 'r'+(++i)+'_'+Date.now().toString(36).slice(-4)}})();
+var S=null, TAB='overview';
+
+var TABS=[['overview','总览'],['rules','① 我的政策'],['courses','② 成绩与绩点'],['points','③ 加分台账'],['portfolio','④ 作品集与科研'],['plan','⑤ 时间轴与材料'],['apply','⑥ 投递看板']];
+
+/* 默认档位表（可编辑；这里是「一键载入」用的政策模板） */
+function defTiers(){
+ return [
+  {id:uid(),cat:'论文',name:'SCI/SSCI 一区 或 A&HCI',level:'一区',score:50},
+  {id:uid(),cat:'论文',name:'SCI/SSCI 二区 / EI',level:'二区·EI',score:30},
+  {id:uid(),cat:'论文',name:'SCD / CSCD 收录',level:'SCD',score:3},
+  {id:uid(),cat:'论文',name:'北大核心 / CSSCI 扩展',level:'核心',score:2},
+  {id:uid(),cat:'论文',name:'其他公开发表期刊',level:'普刊',score:1},
+  {id:uid(),cat:'专利',name:'国际发明专利授权',level:'国际发明',score:30},
+  {id:uid(),cat:'专利',name:'国内发明专利授权',level:'发明',score:10},
+  {id:uid(),cat:'专利',name:'实用新型专利授权',level:'实用新型',score:2},
+  {id:uid(),cat:'竞赛',name:'互联网+ / 挑战杯 金奖',level:'金奖',score:100},
+  {id:uid(),cat:'竞赛',name:'互联网+ 银奖 / 挑战杯 一等',level:'银·一等',score:80},
+  {id:uid(),cat:'竞赛',name:'互联网+ 铜奖 / 挑战杯 二等',level:'铜·二等',score:60},
+  {id:uid(),cat:'竞赛',name:'其他国家级竞赛（一类）',level:'国家一类',score:8},
+  {id:uid(),cat:'竞赛',name:'其他国家级竞赛（二类）',level:'国家二类',score:3},
+  {id:uid(),cat:'大创',name:'国家级大创 优秀结题',level:'国优',score:15},
+  {id:uid(),cat:'大创',name:'国家级大创 结题',level:'国创',score:10},
+  {id:uid(),cat:'大创',name:'省级大创 优秀结题',level:'省优',score:8},
+  {id:uid(),cat:'大创',name:'校级大创 结题',level:'校创',score:2},
+  {id:uid(),cat:'志愿',name:'省级以上志愿服务',level:'省级以上',score:10},
+  {id:uid(),cat:'国际组织',name:'国际组织实习',level:'实习',score:100},
+  {id:uid(),cat:'参军',name:'服役合格 / 立功',level:'退役',score:100}
+ ];
+}
+function blankState(){
+ var gp=[[95,4.5],[90,4.0],[84,3.5],[79,3.0],[75,2.5],[60,2.0],[0,0]];
+ return {
+  meta:{grade:'大二',school:'',major:'',classSize:'',rankNow:'',maxGpa:4.5,targetRank:'',safetyGoal:80},
+  weights:{study:70,research:10,contest:15,other:5},
+  gpaMap:gp.slice(),
+  tiers:defTiers(),
+  policies:[{id:'p_default',name:'我的第一套政策',weights:{study:70,research:10,contest:15,other:5},gpaMap:gp.slice(),tiers:defTiers()}],
+  curPolicyId:'p_default',
+  courses:[], awards:[], portfolio:[], timeline:[], materials:[], apply:[], weekly:''
+ };
+}
+function demoState(){
+ var s=blankState();
+ s.meta={grade:'大二',school:'示例：设计类专业',major:'视觉传达设计',classSize:203,rankNow:3,maxGpa:4.5,targetRank:5,safetyGoal:80};
+ s.courses=[
+  {id:uid(),term:'大一上',name:'设计基础·色彩',credit:12,score:94},
+  {id:uid(),term:'大一上',name:'造型基础',credit:4.5,score:90},
+  {id:uid(),term:'大一上',name:'大学英语(1)',credit:2,score:80},
+  {id:uid(),term:'大一上',name:'计算机基础',credit:1,score:78},
+  {id:uid(),term:'大二下',name:'构成设计',credit:12,score:95},
+  {id:uid(),term:'大二下',name:'数字媒体设计',credit:3,score:92},
+  {id:uid(),term:'大二下',name:'摄影',credit:2,score:97},
+  {id:uid(),term:'大二下',name:'体育(2)',credit:0.5,score:88}
+ ];
+ s.awards=[
+  {id:uid(),kind:'论文',name:'HCII 2025（一作&通讯）',tierId:'',custom:30,pos:1,total:1,status:'已发表',note:'清华A类会议'},
+  {id:uid(),kind:'论文',name:'ICID 2024',tierId:'',custom:20,pos:1,total:1,status:'已发表',note:'EI 会议'},
+  {id:uid(),kind:'论文',name:'《中国民族博览》SCD 录用',tierId:'',custom:3,pos:1,total:1,status:'录用',note:''},
+  {id:uid(),kind:'论文',name:'本科科研总结（课程论文打磨）',tierId:'',custom:2,pos:1,total:1,status:'在投',note:'未发表也别丢'},
+  {id:uid(),kind:'专利',name:'一种可调节式 AR 眼镜',tierId:'',custom:2,pos:1,total:1,status:'授权',note:'实用新型'},
+  {id:uid(),kind:'专利',name:'版画刻刀与拓印刷组合件',tierId:'',custom:2,pos:1,total:1,status:'授权',note:'实用新型'},
+  {id:uid(),kind:'大创',name:'基于信息可视化的云南甲马科普交互设计',tierId:'',custom:15,pos:1,total:1,status:'国家级优秀结题',note:'项目负责人'},
+  {id:uid(),kind:'竞赛',name:'中国国际大学生创新大赛 国家级二等奖',tierId:'',custom:80,pos:1,total:4,status:'',note:'团队第1位'},
+  {id:uid(),kind:'竞赛',name:'米兰设计周 国家级二等奖',tierId:'',custom:8,pos:1,total:3,status:'',note:''},
+  {id:uid(),kind:'竞赛',name:'省级竞赛 × 若干（示例）',tierId:'',custom:3,pos:1,total:3,status:'',note:'海投，别嫌麻烦'},
+  {id:uid(),kind:'志愿',name:'省级以上志愿服务（示例）',tierId:'',custom:10,pos:1,total:1,status:'',note:''}
+ ];
+ s.portfolio=[
+  {id:uid(),name:'云南甲马·信息可视化科普交互',type:'科研+竞赛',start:'2024.05',end:'2025.05',status:'已入册',pages:12,next:'2026.06 改版',done:false},
+  {id:uid(),name:'AR 儿童自然科普《玄秘试炼》',type:'科研+竞赛',start:'2024.09',end:'2025.11',status:'已入册',pages:10,next:'',done:false},
+  {id:uid(),name:'AI 情绪交互装置 Emoji-ing',type:'课程作业',start:'2025.02',end:'2025.04',status:'已入册',pages:8,next:'补过程录像',done:false},
+  {id:uid(),name:'湿地公园儿童科普文创手册',type:'社会实践',start:'2025.05',end:'',status:'进行中',pages:0,next:'补调研照片',done:false}
+ ];
+ s.timeline=[
+  {id:uid(),g:'大一',t:'翻出本校《推免工作实施办法》，记下名额与前三年占比',done:true},
+  {id:uid(),g:'大一',t:'问学长学姐：这个专业保研率、往年保去哪、加分开哪几项',done:true},
+  {id:uid(),g:'大一',t:'上课坐第一排、主动做汇报——让老师记住你（刷脸）',done:true},
+  {id:uid(),g:'大一',t:'公选课挑「事少、给分高」的，先把绩点抬起来',done:true},
+  {id:uid(),g:'大一',t:'建一个作品集素材文件夹，先存不筛',done:false},
+  {id:uid(),g:'大二',t:'每个专业课作业都排版提交竞赛，别嫌麻烦',done:false},
+  {id:uid(),g:'大二',t:'开始每周读 1~2 篇论文，记阅读笔记',done:false},
+  {id:uid(),g:'大二',t:'找一位本校老师聊选题 / 尝试进组',done:false},
+  {id:uid(),g:'大二',t:'争取当小组长，练时间规划 + 沟通（适配夏令营工作坊）',done:false},
+  {id:uid(),g:'大二',t:'四六级刷起来，英语是硬门槛',done:false},
+  {id:uid(),g:'大三上',t:'锁定 4~6 个作品集项目，砍掉凑数的',done:false},
+  {id:uid(),g:'大三上',t:'至少 1 篇论文投稿 / 在投',done:false},
+  {id:uid(),g:'大三上',t:'补专利或大创立项（可报销版面费）',done:false},
+  {id:uid(),g:'大三上',t:'6-7 月投夏令营，海投为主',done:false},
+  {id:uid(),g:'大三下',t:'6 月出作品集第一版 + 全套文书',done:false},
+  {id:uid(),g:'大三下',t:'预推免海投，同时套磁导师',done:false},
+  {id:uid(),g:'大三下',t:'每次面试后记题库，复盘比回血重要',done:false}
+ ];
+ s.materials=[
+  {id:uid(),g:'必选',t:'成绩单（教务处盖章）',note:'大一结束就去开，别等大三',done:true},
+  {id:uid(),g:'必选',t:'排名 / 综合成绩排名证明（盖章）',note:'很多学校要，提前问学院',done:true},
+  {id:uid(),g:'必选',t:'各类获奖证书扫描件',note:'分类存档，命名「年份-竞赛-奖项」',done:true},
+  {id:uid(),g:'必选',t:'英语四六级成绩单',note:'先确认本校门槛（常见 425 分）',done:true},
+  {id:uid(),g:'必选',t:'身份证 + 学生证复印件',note:'',done:false},
+  {id:uid(),g:'必选',t:'一寸照（红底 + 蓝底）电子版',note:'多存几版，报名系统常要',done:false},
+  {id:uid(),g:'必选',t:'简历（1 页，中英各一版）',note:'报名、发邮件、面试三处通用',done:false},
+  {id:uid(),g:'必选',t:'个人陈述（按字数做几版）',note:'常见 A4 一页 / 两页，800-1500 字',done:false},
+  {id:uid(),g:'必选',t:'教师推荐信（学生写、老师签字，再备空版）',note:'越熟悉越好，问往届找的是谁',done:false},
+  {id:uid(),g:'必选',t:'系统填报备注（200 / 400 字）',note:'别等系统开了才想文案',done:false},
+  {id:uid(),g:'建议',t:'纸质作品集 5 本左右（蝴蝶装）',note:'面试当场递',done:false},
+  {id:uid(),g:'建议',t:'简历打印 5 份（珠光纸 / 覆膜）',note:'',done:false},
+  {id:uid(),g:'建议',t:'本科科研工作总结 PPT',note:'联系导师、课题组面试用',done:false},
+  {id:uid(),g:'建议',t:'科研成果代表作（未发表也可）',note:'看选题方向与写作质量，不只看发表',done:false}
+ ];
+ s.apply=[
+  {id:uid(),school:'湖南大学',college:'设计艺术学院',major:'设计学（学硕）',date:'2025-07',invited:1,result:'优营',form:'作品集+中英文问答',q:'作品集中这个项目你负责哪一部分？'},
+  {id:uid(),school:'东南大学',college:'设计学院',major:'-design',date:'2025-07',invited:1,result:'优营',form:'工作坊',q:''},
+  {id:uid(),school:'江南大学',college:'设计学院',major:'视觉传达',date:'2025-07',invited:0,result:'未入营',form:'',q:'7-8 月基本被拒，很正常'},
+  {id:uid(),school:'浙江大学',college:'软件学院',major:'数字文创',date:'2025-08',invited:0,result:'未入营',form:'',q:'可投非设计专业学院，可能有惊喜'},
+  {id:uid(),school:'（预推免示例）',college:'',major:'',date:'',invited:'',result:'',form:'',q:''}
+ ];
+ s.weekly='2';
+ return s;
+}
+
+/* ============ 政策库：多套政策并存 / 文本自动识别 ============ */
+function curPol(){ for(var i=0;i<S.policies.length;i++) if(S.policies[i].id===S.curPolicyId) return S.policies[i]; return S.policies[0]; }
+function switchPolicy(id){ S.curPolicyId=id; var p=curPol(); S.weights=p.weights; S.gpaMap=p.gpaMap; S.tiers=p.tiers; save(); render(); }
+function newPolicy(){
+  var p={id:uid(),name:'政策 '+(S.policies.length+1),
+    weights:{study:num(S.weights.study),research:num(S.weights.research),contest:num(S.weights.contest),other:num(S.weights.other)},
+    gpaMap:JSON.parse(JSON.stringify(S.gpaMap)), tiers:JSON.parse(JSON.stringify(S.tiers))};
+  S.policies.push(p); S.curPolicyId=p.id; save(); render();
+}
+function delPolicy(id){
+  if(S.policies.length<=1){alert('至少要留一套政策。');return;}
+  if(!confirm('删除这套政策？（只是规则，不影响你填的成绩和加分记录）'))return;
+  S.policies=S.policies.filter(function(p){return p.id!==id});
+  if(S.curPolicyId===id) S.curPolicyId=S.policies[0].id;
+  var p=curPol(); S.weights=p.weights;S.gpaMap=p.gpaMap;S.tiers=p.tiers;
+  save(); render();
+}
+function savePolicyHere(){
+  var p=curPol(); p.weights=S.weights; p.gpaMap=S.gpaMap; p.tiers=S.tiers;
+  save(); alert('已把当前规则存进「'+p.name+'」。');
+}
+function exportPolicy(){ var p=curPol(); p.weights=S.weights;p.gpaMap=S.gpaMap;p.tiers=S.tiers;
+  var b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='保研政策-'+p.name+'.json';a.click(); }
+function importPolicy(text){
+  var p; try{ p=JSON.parse(text); }catch(e){ alert('这不是有效的政策 JSON。请重新复制。'); return; }
+  if(!p||!p.weights) { alert('文件里没找到 weights（权重）字段。'); return; }
+  var np={id:uid(),name:p.name||('导入政策 '+S.policies.length),
+    weights:{study:num(p.weights.study)||70,research:num(p.weights.research)||10,contest:num(p.weights.contest)||15,other:num(p.weights.other)||5},
+    gpaMap:(p.gpaMap&&p.gpaMap.length)?p.gpaMap:JSON.parse(JSON.stringify(S.gpaMap)),
+    tiers:(p.tiers&&p.tiers.length)?p.tiers:JSON.parse(JSON.stringify(S.tiers))};
+  S.policies.push(np); S.curPolicyId=np.id;
+  S.weights=np.weights; S.gpaMap=np.gpaMap; S.tiers=np.tiers;
+  save(); render(); alert('已导入政策「'+np.name+'」，共 '+np.tiers.length+' 条加分档位。');
+}
+/* 把一段政策公文文本，抽出权重 + 加分档位 */
+function policyImport(){ var el=document.getElementById('polFile'); if(el) el.click(); }
+function onPolFile(ev){
+  var f=ev.target.files&&ev.target.files[0]; if(!f)return;
+  var fr=new FileReader();
+  fr.onload=function(){ importPolicy(String(fr.result)); };
+  fr.readAsText(f,'utf-8');
+  ev.target.value='';
+}
+function parsePolicyText(raw){
+  var txt=String(raw).replace(/％/g,'%').replace(/\r/g,'').replace(/\u3000/g,' ');
+  var lines=txt.split('\n').map(function(s){return s.replace(/\s+/g,' ').trim()}).filter(function(s){return s.length>3});
+  var CATS=[['竞赛',['互联网+','挑战杯','竞赛','大赛','挑战赛','艺术展演','数学建模','蓝桥杯']],
+            ['论文',['SCI','SSCI','EI','SCD','CSCD','CSSCI','A&HCI','北大核心','核心','期刊','论文']],
+            ['专利',['专利','知识产权']],
+            ['大创',['大创','创新创业训练','创新训练','立项']],
+            ['志愿',['志愿','志愿服务']],
+            ['参军',['参军','退役','服役','兵役']],
+            ['国际组织',['国际组织','实习']]];
+  var tiers=[],seen={};
+  for(var li=0;li<lines.length;li++){
+    var line=lines[li].replace(/^[（(]?\d{1,2}[）).、:：\s]+/,'').trim();
+    if(!line||line.length>60) continue;
+    var cat='';
+    for(var ci=0;ci<CATS.length;ci++){ if(CATS[ci][1].some(function(k){return line.indexOf(k)>=0})){cat=CATS[ci][0];break;} }
+    if(!cat) continue;
+    var head=line.replace(/(?:\d{1,3}(?:\.\d+)?)(?:\s*\/\s*\d{1,3}(?:\.\d+)?){0,5}[\s\S]*$/,'');
+    var m=line.match(/\d{1,3}(?:\.\d+)?(?:\s*\/\s*\d{1,3}(?:\.\d+)?){1,5}/);
+    var nums=[];
+    if(m){ nums=m[0].split('/').map(function(s){return Number(s.trim())}).filter(function(n){return n>0&&n<=100}); }
+    if(!nums.length){ var t=line.match(/(\d{1,3}(?:\.\d+)?)\s*$/); if(t){var v=Number(t[1]); if(v>0&&v<=100) nums=[v];} }
+    if(!nums.length) continue;
+    var lv=[];
+    if(nums.length>=2){
+      if(/金/.test(head)&&/银/.test(head)&&/铜/.test(head)) lv=['金奖','银奖','铜奖'];
+      else if(/[一二三四五特]\s*\/\s*[一二三四五特]|特等|一等|二等|三等/.test(head)){
+        var pairing=/[一二三四五特]\s*\/\s*[一二三四五特]/.test(head);
+        var c=pairing?nums.length:((head.match(/[特一二三四五]等/g)||[]).length||nums.length);
+        var n=Math.max(1,Math.min(nums.length,c||nums.length));
+        lv=[];for(var q2=0;q2<n;q2++) lv.push(['一等','二等','三等','四等','五等'][q2]);
+      } else { for(var q3=0;q3<nums.length;q3++) lv.push('第'+(q3+1)+'档'); }
+    }else{
+      var mm=head.match(/(特等|一等奖|二等奖|三等奖|四等奖|金奖|银奖|铜奖|优秀|立项|结题)/);
+      lv=[mm?mm[1]:'待定'];
+    }
+    for(var k2=0;k2<lv.length;k2++){
+      var sc=nums[k2]!=null?nums[k2]:nums[0];
+      var key=cat+'|'+lv[k2]+'|'+sc; if(seen[key]) continue; seen[key]=1;
+      tiers.push({cat:cat,name:line.slice(0,28),level:lv[k2],score:sc});
+    }
+  }
+  function grab(keys){
+    for(var i=0;i<keys.length;i++){
+      var re=new RegExp(keys[i]+'[^\\d]{0,16}?(\\d{1,3}(?:\\.\\d+)?)\\s*%?','g'),m2;
+      while((m2=re.exec(txt))){ var v=Number(m2[1]); if(v>0&&v<=100) return v; }
+    }
+    return null;
+  }
+  var w={study:grab(['学业成绩','加权成绩','学业']),research:grab(['科研成果','科研','论文成果']),
+         contest:grab(['学科竞赛','竞赛']),other:grab(['志愿服务','参军','综合素质','全面发展','其他加分'])};
+  return {weights:w,tiers:tiers.slice(0,80)};
+}
+function doParse(){
+  var el=document.getElementById('policyRaw');
+  if(!el||!el.value.trim()){alert('先把本校《推免工作实施办法》里关于「综合成绩构成」和「加分标准」那几段文字粘进来。');return;}
+  var r=parsePolicyText(el.value);
+  var box=document.getElementById('parseOut');
+  if(!r.tiers.length&&!r.weights.study){ box.innerHTML='<div class="note">没识别出来。常见原因：政策是图片版复制不出文字，或者一段里同时写了好几个奖项。这种情况手工填「加分档位表」更稳。</div>'; return; }
+  var h='<h3>识别结果（务必核对，识别仅供参考）</h3><div class="kv"><span>权重</span><b>学业 '+(r.weights.study==null?'?':r.weights.study)+'% · 科研 '+(r.weights.research==null?'?':r.weights.research)+'% · 竞赛 '+(r.weights.contest==null?'?':r.weights.contest)+'% · 其他 '+(r.weights.other==null?'?':r.weights.other)+'%</b></div>';
+  h+='<div class="tbwrap"><table class="tb"><tr><th>类别</th><th>原文片段</th><th>等次</th><th class="r2">分值</th></tr>';
+  r.tiers.forEach(function(t,i){
+    h+='<tr><td>'+t.cat+'</td><td>'+esc(t.name)+'</td><td>'+t.level+'</td><td><input type="text" id="pq'+i+'" value="'+t.score+'"></td></tr>';
+  });
+  h+='</table></div><div class="row" style="margin-top:10px">'
+   +'<div class="field" style="flex:1;min-width:180px"><span class="t">这套政策叫什么（建议：学校名+年份）</span><input type="text" id="pqName" value=""></div>'
+   +'<button class="pri" onclick="applyParsed()">应用为当前政策</button></div>';
+  window.__parsed=r;
+  box.innerHTML=h;
+}
+function applyParsed(){
+  var r=window.__parsed; if(!r) return;
+  var tid=document.getElementById('pq0');
+  var tb=document.getElementById('parseOut');
+  var last=0;
+  if(tb){var ins=tb.querySelectorAll('input[id^=pq]'); last=ins.length;}
+  var tiers=r.tiers.map(function(t,i){
+    var val=(i<last)?(Number(document.getElementById('pq'+i)&&document.getElementById('pq'+i).value)||t.score):t.score;
+    return {id:uid(),cat:t.cat,name:t.name,level:t.level,score:val};
+  });
+  var w=r.weights, wsum=0;
+  ['study','research','contest','other'].forEach(function(k){ if(w[k]!=null) wsum+=Number(w[k]); });
+  if(wsum>0){
+    S.weights={study:(w.study==null?Math.round(S.weights.study):w.study),
+               research:(w.research==null?Math.round(S.weights.research):w.research),
+               contest:(w.contest==null?Math.round(S.weights.contest):w.contest),
+               other:(w.other==null?Math.round(S.weights.other):w.other)};
+  }
+  var nameEl=document.getElementById('pqName'); var nm=(nameEl&&nameEl.value.trim())||('识别政策 '+S.policies.length);
+  S.policies.push({id:uid(),name:nm,weights:S.weights,gpaMap:JSON.parse(JSON.stringify(S.gpaMap)),tiers:tiers});
+  S.curPolicyId=S.policies[S.policies.length-1].id;
+  S.tiers=tiers; save(); render();
+  alert('已应用「'+nm+'」，共 '+tiers.length+' 条档位。去「③ 加分台账」把奖状记进来就会自动折分了。');
+}
+
+/* ============ 计算 ============ */
+function gpaOf(sc){
+  sc=Number(sc); if(isNaN(sc))return 0;
+  for(var i=0;i<S.gpaMap.length;i++){ if(sc>=S.gpaMap[i][0]) return S.gpaMap[i][1]; }
+  return 0;
+}
+function rankFactor(pos,total){
+  pos=Number(pos)||1; total=Number(total)||1;
+  if(total<=2) return pos===1?2/3:1/3;
+  return 1/Math.pow(2,pos);
+}
+function tierOf(id){ for(var i=0;i<S.tiers.length;i++) if(S.tiers[i].id===id) return S.tiers[i]; return null; }
+function awardScore(a){
+  var t=tierOf(a.tierId);
+  var base=(t?Number(t.score):Number(a.custom)||0);
+  if(!t) return base;
+  return base*rankFactor(a.pos,a.total);
+}
+function sumKind(list){ var s=0; for(var i=0;i<list.length;i++) s+=awardScore(list[i]); return s; }
+function calc(){
+  var cr=0,cw=0,i;
+  for(i=0;i<S.courses.length;i++){var c=S.courses[i];var g=Number(c.credit)||0,h=gpaOf(c.score);cr+=g*h;cw+=g;}
+  var gpa=cw>0?cr/cw:0;
+  var studyStd=(Number(S.meta.maxGpa)>0)?(gpa/Number(S.meta.maxGpa))*100:0;
+  var as=S.awards;
+  var rs=Math.min(100,sumKind(as.filter(function(a){return a.kind==='论文'||a.kind==='专利'||a.kind==='大创';})));
+  var cs=Math.min(100,sumKind(as.filter(function(a){return a.kind==='竞赛';})));
+  var os=Math.min(100,sumKind(as.filter(function(a){return a.kind==='志愿'||a.kind==='参军'||a.kind==='国际组织';})));
+  var w=S.weights, wsum=(Number(w.study)||0)+(Number(w.research)||0)+(Number(w.contest)||0)+(Number(w.other)||0)||100;
+  var total=(studyStd*(Number(w.study)||0)+rs*(Number(w.research)||0)+cs*(Number(w.contest)||0)+os*(Number(w.other)||0))/wsum;
+  var rank=Number(S.meta.rankNow), tgt=Number(S.meta.targetRank), size=Number(S.meta.classSize);
+  var safe='—',cls='';
+  if(rank&&tgt){
+    if(rank<=tgt*0.6){safe='稳';cls='ok';} else if(rank<=tgt){safe='安全';cls='ok';} else if(rank<=tgt*1.5){safe='边缘';cls='warn';} else {safe='偏危险';cls='bad';}
+  }
+  var tl=S.timeline, tdone=tl.filter(function(x){return x.done}).length;
+  var book=S.portfolio.filter(function(x){return x.status==='已入册'}).length;
+  var invited=S.apply.filter(function(x){return x.invited==1||x.invited===true||x.invited==='是'}).length;
+  var applied=S.apply.filter(function(x){return x.date}).length;
+  return {gpa:gpa,studyStd:studyStd,rs:rs,cs:cs,os:os,total:total,safe:safe,cls:cls,tdone:tdone,tl:tl.length,book:book,applied:applied,invited:invited};
+}
+
+/* ============ 渲染 ============ */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function num(v,d){v=Number(v);return isNaN(v)?(d||0):v}
+function f1(v){return (Math.round(v*100)/100).toFixed(2)}
+
+function render(){
+  document.getElementById('tabbar').innerHTML=TABS.map(function(t){
+    return '<button class="tab'+(TAB===t[0]?' on':'')+'" onclick="go(\''+t[0]+'\')">'+t[1]+'</button>';
+  }).join('');
+  var m=document.getElementById('app');
+  m.innerHTML=({overview:pOverview,rules:pRules,courses:pCourses,points:pPoints,portfolio:pPortfolio,plan:pPlan,apply:pApply})[TAB]();
+  updateDerived();
+}
+function go(t){TAB=t;render();window.scrollTo(0,0)}
+
+function pOverview(){
+  var c=calc();
+  var ring='background:conic-gradient(var(--blue) '+Math.max(0,Math.min(100,c.total))+'%, #E4EAF0 0)';
+  var gradeBar=S.timeline.filter(function(x){return x.g==='大三'}).length;
+  var quote='<div class="quote">焦虑是保研的常态。把让人焦虑的那件事拆开反复问：这个我能改变吗？能，就立刻做；不能，就别内耗。<small>——上岸学姐的原话，送给大一的你</small></div>';
+  return ''
+  +'<div class="note">'+((S.demo)?'当前是<b>示例数据</b>（上岸学姐的公开经历，成绩为演示值）。想开始记你自己的，点右上角「清空我的数据」。':'')+'</div>'
+  +'<div class="card"><div class="grid g2" style="align-items:center">'
+    +'<div style="text-align:center">'
+      +'<div class="ring" style="'+ring+'"><div><div class="n">'+Math.round(c.total)+'</div><div class="l">当前综合得分 / 100</div></div></div>'
+      +'<div style="margin-top:10px;font-size:13px;color:var(--ink2)">按你自己在「我的政策」里填的规则计算</div>'
+    +'</div>'
+    +'<div>'
+      +'<h2>先填 5 个数字，它就活了</h2>'
+      +'<div class="field" style="margin-top:8px"><label class="f"><span class="t">你现在几年级</span><select data-k="meta.grade">'+opts(['大一','大二','大三'],S.meta.grade)+'</select></label></div>'
+      +two(field('meta.school','学校 / 学院',S.meta.school),field('meta.major','专业',S.meta.major))
+      +two(field('meta.classSize','本专业总人数',S.meta.classSize),field('meta.rankNow','当前排名 / 前几名',S.meta.rankNow))
+      +two(field('meta.targetRank','目标：保进前几名',S.meta.targetRank),field('meta.maxGpa','专业最高绩点（一般 4.5 / 5.0）',S.meta.maxGpa))
+      +'<div class="note">提示：不知道最高绩点就先填 4.5 或 5.0，后面可以随时改。目标暂时填「前 5 名」也行，先让仪表盘跑起来。</div>'
+    +'</div>'
+  +'</div></div>'
+  +'<div class="grid g4">'
+    +metric('排名安全度',c.safe,'当前 '+ (S.meta.rankNow||'-') +' / '+ (S.meta.classSize||'-') ,c.cls)
+    +metric('加权绩点',f1(c.gpa),'满分 '+(S.meta.maxGpa||'-'))
+    +metric('已获加分（科研+竞赛）',Math.round(c.rs+c.cs),'标准分，上限各 100')
+    +metric('作品集已入册',c.book,'目标 4 ~ 6 个项目')
+  +'</div>'
+  +'<div class="card"><h2>综合得分怎么来的</h2>'
+    +barRow('学业成绩',c.studyStd,S.weights.study)
+    +barRow('科研成果',c.rs,S.weights.research)
+    +barRow('学科竞赛',c.cs,S.weights.contest)
+    +barRow('其他（志愿·参军·国际组织）',c.os,S.weights.other)
+    +'<div class="note">标准分上限都是 100 分。规听到「我的政策」页可改权重、改每一档加分的分值。示例里用的就是某 211 高校 2024 版文件结构：学业 70%、科研成果 10%、学科竞赛 15%、其余 5%。</div>'
+  +'</div>'
+  +quote
+  +'<div class="card"><h2>给帮你解析成绩的人看一眼</h2>'
+   +'<p class="hint">你填完之后点「全选复制」，粘给学姐或帮你解析成绩的同学，对方一眼就知道你到哪一步了、还差什么。数据不会上传，只是复制这段文字。</p>'
+   +'<textarea id="sumBox" readonly style="min-height:150px" onclick="this.select()"></textarea>'
+   +'<div class="row" style="margin-top:8px"><button class="pri" onclick="copySummary()">全选复制</button>'
+   +'<span class="hint">想留档的，用顶上「备份 JSON」存一份。</span></div></div>'
+  +'<div class="card"><h2>你现在该干嘛：按年级看</h2>'
+    +'<div class="grid g3">'
+    +'<div><h3>大一 · 摸底</h3><ul class="ck">'+ckList('大一')+'</ul></div>'
+    +'<div><h3>大二 · 积累</h3><ul class="ck">'+ckList('大二')+'</ul></div>'
+    +'<div><h3>大三 · 收割</h3><ul class="ck">'+ckList('大三')+'</ul></div>'
+    +'</div>'
+    +'<div class="note">完整 16 条任务清单在「⑤ 时间轴与材料」里，全部可以勾选。</div>'
+  +'</div>';
+}
+function metric(l,v,u,cls){
+  return '<div class="metric"><div class="lb">'+l+'</div><div class="vl">'+v+(u?' <span class="un">'+u+'</span>':'')+'</div></div>';
+}
+function buildSummary(){
+  var c=calc(),m=S.meta;
+  return ['【保研工作台 · 我的进度】',
+   '年级：'+(m.grade||'未填')+'　学校专业：'+(m.school||'未填')+' '+(m.major||''),
+   '排名：'+(m.rankNow||'未填')+' / '+(m.classSize||'未填')+'（目标前 '+(m.targetRank||'未填')+'）　安全度：'+c.safe,
+   '加权绩点：'+f1(c.gpa)+' / '+(m.maxGpa||'-'),
+   '综合得分：'+Math.round(c.total),
+   '加分台账：科研 '+Math.round(c.rs)+'　竞赛 '+Math.round(c.cs)+'　其他 '+Math.round(c.os),
+   '作品集：入册 '+c.book+'，共 '+S.portfolio.length+' 个项目',
+   '时间轴：'+c.tdone+' / '+c.tl+' 条已完成',
+   '投递：'+c.applied+' 所，入营 '+c.invited+'，命中率 '+(c.applied?Math.round(c.invited/c.applied*100):0)+'%',
+   ''
+  ].join('\n');
+}
+function copySummary(){
+  var el=document.getElementById('sumBox'); if(!el) return;
+  el.focus(); el.select();
+  try{ document.execCommand('copy'); alert('已复制，粘到聊天窗口发给帮你解析成绩的同学就行。'); }
+  catch(e){ alert('自动复制没成功，请手动 Ctrl+C。'); }
+}
+function two(a,b){return '<div class="row" style="margin-top:8px">'+a+'<div style="flex:1;min-width:150px">'+b+'</div></div>'}
+function barRow(l,v,w){
+  return '<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><span>'+l+'</span><span style="color:var(--ink2)">标准分 '+Math.round(v)+' × 权重 '+w+'%</span></div>'
+  +'<div class="bar" style="margin-top:5px"><i style="width:'+Math.max(0,Math.min(100,v))+'%"></i></div></div>';
+}
+function field(k,t,v){return '<div class="field"><label class="f"><span class="t">'+t+'</span><input type="text" data-k="'+k+'" value="'+esc(v)+'"></label></div>'}
+function ckList(g){
+  return S.timeline.filter(function(x){return x.g===g}).map(function(x){
+    return '<li><input type="checkbox" data-ck="timeline" data-id="'+x.id+'"'+(x.done?' checked':'')+'><span class="'+(x.done?'chk-ok':'')+'">'+esc(x.t)+'</span></li>';
+  }).join('')||'<li><span class="hint">暂无</span></li>';
+}
+
+/* --- 规则页 --- */
+function pRules(){
+  var h='<div class="card"><h2>① 你的学校怎么算综合分</h2>'
+   +'<p class="hint">每个学校规则不同。最省事的办法：把本校《推免工作实施办法》里讲「综合成绩构成」和「加分标准」的那两段话粘进来，下面自动出档位表，你核对一遍就能用。</p>'
+   +'<div class="card" style="padding:16px 18px;margin:14px 0 0;background:#FAFCFE">'
+   +'<h3>政策卡（一套学校一份，随时切换）</h3>'
+   +'<div class="field" style="margin-top:8px"><span class="t">当前生效的政策</span><select onchange="switchPolicy(this.value)">'
+   +S.policies.map(function(p){return '<option value="'+p.id+'"'+(p.id===S.curPolicyId?' selected':'')+'>'+esc(p.name)+'（'+p.tiers.length+' 条档位）</option>'}).join('')
+   +'</select></div>'
+   +'<div class="row" style="margin-top:8px"><button onclick="newPolicy()">+ 新建一套政策</button>'
+   +'<button onclick="savePolicyHere()">保存当前改动</button>'
+   +'<button onclick="delPolicy(curPol().id)">删除这套</button>'
+   +'<button onclick="exportPolicy()">导出这套 JSON</button>'
+   +'<button onclick="policyImport()">导入 JSON</button></div>'
+   +'<div class="note">成绩、加分记录、投递记录跟你选哪套政策无关。换政策＝换一套算分规则，历史数据都还在。</div>'
+   +'</div>'
+   +'<input type="file" id="polFile" accept=".json" style="display:none" onchange="onPolFile(this)">'
+   +'<div class="sep"></div><h3>快：粘贴政策文本，自动识别</h3>'
+   +'<textarea id="policyRaw" style="min-height:96px" placeholder="把本校推免办法里这两类句子粘进来：&#10;1）综合成绩构成：学业成绩（占比 70%）……科研成果占 10%……学科竞赛占 15%……&#10;2）加分标准：互联网+ 大赛 金/银/铜奖 100/80/60……实用新型专利授权 2……"></textarea>'
+   +'<div class="row" style="margin-top:8px"><button class="pri" onclick="doParse()">识别规则</button>'
+   +'<span class="hint">识别结果列在下面，核对一遍再点「应用为当前政策」。识别不出来的（政策是图片版、或一段里混了好几个奖）就手工填下面的档位表。</span></div>'
+   +'<div id="parseOut"></div>'
+   +'<div class="sep"></div><h3>慢：手填权重（没粘到文本就填这儿）</h3>'
+   +'<div class="row" style="margin-top:10px">'
+   +' <div class="field" style="flex:1;min-width:130px"><span class="t">学业成绩</span><input type="text" data-k="weights.study" value="'+S.weights.study+'"></div>'
+   +' <div class="field" style="flex:1;min-width:130px"><span class="t">科研成果</span><input type="text" data-k="weights.research" value="'+S.weights.research+'"></div>'
+   +' <div class="field" style="flex:1;min-width:130px"><span class="t">学科竞赛</span><input type="text" data-k="weights.contest" value="'+S.weights.contest+'"></div>'
+   +' <div class="field" style="flex:1;min-width:130px"><span class="t">其他加分</span><input type="text" data-k="weights.other" value="'+S.weights.other+'"></div>'
+   +'</div>';
+  var w=num(S.weights.study)+num(S.weights.research)+num(S.weights.contest)+num(S.weights.other);
+  h+='<div class="note">当前权重合计 '+w+'%'+(Math.abs(w-100)>0.5?'（不等于 100%，已按比例折算）':'（等于 100%，正常）')+'。不同学校还会单列参军、志愿服务、国际组织实习，你可以把它们塞进「其他加分」。</div>';
+
+  h+='<div class="sep"></div><h3>成绩 → 绩点 换算表（按你学校那张表填）</h3>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>成绩下限</th><th>对应绩点</th><th></th></tr>';
+  S.gpaMap.forEach(function(m,i){
+    h+='<tr><td><input type="text" data-k="gpaMap.'+i+'.0" value="'+m[0]+'"></td>'
+      +'<td><input type="text" data-k="gpaMap.'+i+'.1" value="'+m[1]+'"></td>'
+      +'<td><button class="delete" onclick="delArr(\'gpaMap\','+i+')">×</button></td></tr>';
+  });
+  h+='</table></div>'
+   +'<button class="sm" onclick="addGpaMap()">+ 加一行</button>'
+   +'<div class="note">从高分到低分填写，第一行匹配不上就往下找。找不到就记 0 分。</div>';
+
+  h+='<div class="sep"></div><h3>加分档位表（竞赛 / 论文 / 专利 / 大创…）</h3>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>类别</th><th>项目</th><th>等次</th><th class="r2">标准分</th><th></th></tr>';
+  S.tiers.forEach(function(t,i){
+    h+='<tr><td><select data-k="tiers.'+i+'.cat" onchange="render()">'+opts(['论文','专利','竞赛','大创','志愿','参军','国际组织','其他'],t.cat)+'</select></td>'
+      +'<td><input type="text" data-k="tiers.'+i+'.name" value="'+esc(t.name)+'"></td>'
+      +'<td><input type="text" data-k="tiers.'+i+'.level" value="'+esc(t.level)+'"></td>'
+      +'<td><input type="text" data-k="tiers.'+i+'.score" value="'+t.score+'"></td>'
+      +'<td class="delete"><button class="delete" onclick="delArr(\'tiers\','+i+')">×</button></td></tr>';
+  });
+  h+='</table></div><button class="sm" onclick="addTier()">+ 加一档</button>';
+  h+='<div class="note">这里只写「这一档值多少分」，团队名次折算规则已经在下面统一处理。</div>';
+
+  h+='<div class="sep"></div><h3>团队名次折算（很多学校都按这个）</h3>'
+   +'<p class="hint">互联网+、挑战杯、大创这类团队项目，一般按「第一名算一半、第二名四分之一、第三名六分之一……」往下折。</p>'
+   +'<div class="row">'
+   +' <div class="field" style="flex:1;min-width:180px"><span class="t">2 人团队：第一名系数</span><input type="text" value="0.67" disabled></div>'
+   +' <div class="field" style="flex:1;min-width:180px"><span class="t">2 人团队：第二名系数</span><input type="text" value="0.33" disabled></div>'
+   +' <div class="field" style="flex:2;min-width:260px"><span class="t">多人团队（3 人以上）第 N 名系数 = 1 / 2^N，可自行改代码里的规则</span><input value="第1名 1/2，第2名 1/4，第3名 1/6…" disabled></div>'
+   +'</div>'
+   +'<div class="note">各校算法不同（有的按团队人数平均分、有的只算第一作者），务必以本校文件为准。不知道怎么填就先用上面的默认值。</div>';
+  return h+'</div>';
+}
+function opts(list,v){return list.map(function(o){return '<option'+(o===v?' selected':'')+'>'+o+'</option>'}).join('')}
+
+/* --- 成绩页 --- */
+function pCourses(){
+  var h='<div class="card"><h2>② 成绩与绩点</h2>'
+   +'<p class="hint">一门课一行，加权绩点自动算。录不完没关系，分几次录；至少把前三年主修课录全，算出来的分才靠谱。</p>'
+   +'<div class="card" style="padding:16px 18px;background:#FAFCFE">'
+   +'<h3>懒得手抄？用导入（可选）</h3>'
+   +'<p class="hint">下面那张表手动录完全够用，分几次录也行，每录一次都会自动重算。导入只是省事：PDF 走在线解析需要联网；扫描件（图片版成绩单）复制不出文字，那种情况直接手工填表就行，不影响使用。</p>'
+   +'<div class="row" style="margin-top:8px"><button class="pri" onclick="tcPick()">选择 PDF 或 txt</button>'
+   +'<input type="file" id="tcFile" accept=".pdf,.txt,.csv" style="display:none" onchange="onTcFile(this)"></div>'
+   +'<textarea id="tcRaw" style="min-height:80px;margin-top:8px" placeholder="也可以直接把成绩单文字粘进来：&#10;色彩 12 92 4.0&#10;大学英语(1) 2 80 3.0&#10;计算机基础 1 78 2.5"></textarea>'
+   +'<div class="row" style="margin-top:8px"><button class="pri" onclick="doParseTranscript()">解析课程</button>'
+   +'<span class="hint">PDF 走在线解析（首次要联网）；如果提示加载失败，说明这份是扫描件复制不出文字——把成绩单另存为 txt 或手动复制粘贴。</span></div>'
+   +'<div id="tcOut"></div>'
+   +'</div>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>学期</th><th>课程</th><th class="r">学分</th><th class="r">成绩</th><th class="r">绩点</th><th></th></tr>';
+  S.courses.forEach(function(c,i){
+    h+='<tr><td><input type="text" data-k="courses.'+i+'.term" value="'+esc(c.term)+'" style="width:88px"></td>'
+      +'<td><input type="text" data-k="courses.'+i+'.name" value="'+esc(c.name)+'"></td>'
+      +'<td><input type="text" data-k="courses.'+i+'.credit" value="'+esc(c.credit)+'"></td>'
+      +'<td><input type="text" data-k="courses.'+i+'.score" value="'+esc(c.score)+'"></td>'
+      +'<td id="gpacell'+i+'"></td>'
+      +'<td class="delete"><button class="delete" onclick="delArr(\'courses\','+i+')">×</button></td></tr>';
+  });
+  h+='</table></div><button class="sm" onclick="addCourse()">+ 加一门课</button>';
+  h+='<div class="sep"></div><div class="grid g4">'
+   +metric('加权平均绩点','<span id="o-gpa"></span>','满分 '+(S.meta.maxGpa||'-'))
+   +metric('学业标准分','<span id="o-study"></span>','/ 100')
+   +metric('已录课程','<span id="o-cn"></span>','门')
+   +metric('总学分','<span id="o-credit"></span>','')
+   +'</div></div>';
+  return h;
+}
+
+/* --- 加分台账 --- */
+function pPoints(){
+  var KINDS=['竞赛','论文','专利','大创','志愿','参军','国际组织','其他'];
+  var h='<div class="card"><h2>③ 加分台账：把奖状一条条记进来</h2>'
+   +'<p class="hint">选类别 → 选等次 → 填团队第几名 / 几个人 → 自动折分。同一类别标准分上限 100 分，超了按 100 算。</p>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>类别</th><th>名称 / 项目</th><th>等次</th><th class="r">第几名</th><th class="r">团队人数</th><th>状态 · 备注</th><th class="r2">折分</th><th></th></tr>';
+  S.awards.forEach(function(a,i){
+    var cats=S.tiers.filter(function(t){return t.cat===a.kind});
+    h+='<tr><td><select data-k="awards.'+i+'.kind" onchange="kindChange('+i+')">'+opts(KINDS,a.kind)+'</select></td>'
+      +'<td><input type="text" data-k="awards.'+i+'.name" value="'+esc(a.name)+'"></td>'
+      +'<td><select data-k="awards.'+i+'.tierId" data-tier="1" onchange="awChange('+i+')"><option value="">自定义</option>'+cats.map(function(t){
+          return '<option value="'+t.id+'"'+(t.id===a.tierId?' selected':'')+'>'+esc(t.name)+' '+t.score+'</option>';
+        }).join('')+'</select></td>'
+      +'<td><input type="text" data-k="awards.'+i+'.pos" value="'+esc(a.pos)+'"></td>'
+      +'<td><input type="text" data-k="awards.'+i+'.total" value="'+esc(a.total)+'"></td>'
+      +'<td><input type="text" data-k="awards.'+i+'.status" value="'+esc(a.status)+'" placeholder="状态/备注"></td>'
+      +'<td id="awcell'+i+'"></td>'
+      +'<td class="delete"><button class="delete" onclick="delArr(\'awards\','+i+')">×</button></td></tr>';
+  });
+  h+='</table></div>'
+   +'<button class="sm" onclick="addAward(\'竞赛\')">+ 记一条竞赛</button> <button class="sm" onclick="addAward(\'论文\')">+ 记一篇论文</button> <button class="sm" onclick="addAward(\'大创\')">+ 记一个大创</button> <button class="sm" onclick="addAward(\'专利\')">+ 记一个专利</button><br><br>'
+   +'<div class="grid g4">'
+   +metric('科研标准分','<span id="o-rs"></span>','论文 / 专利 / 大创，上限 100')
+   +metric('竞赛标准分','<span id="o-cs"></span>','上限 100')
+   +metric('其他标准分','<span id="o-os"></span>','志愿 / 参军 / 国际组织')
+   +metric('综合得分','<span id="o-total"></span>','/ 100')
+   +'</div>'
+   +'<div class="note">没发表论文也别空着：简历和面试看的是选题方向 + 写作质量，课程论文打磨出来照样算成果。</div></div>';
+  return h;
+}
+function kindChange(i){
+  var a=S.awards[i];
+  var ts=S.tiers.filter(function(t){return t.cat===a.kind});
+  a.tierId=ts.length?ts[0].id:'';
+  save(); render();
+}
+function addAward(k){var a={id:uid(),kind:k,name:'',tierId:'',custom:0,pos:1,total:1,status:'',note:''};
+  var ts=S.tiers.filter(function(t){return t.cat===k});
+  if(ts.length) a.tierId=ts[0].id;
+  S.awards.push(a);render();}
+function addCourse(){S.courses.push({id:uid(),term:'',name:'',credit:'',score:''});render()}
+function addTier(){S.tiers.push({id:uid(),cat:'其他',name:'新类别',level:'',score:5});render()}
+function addGpaMap(){S.gpaMap.push([0,0]);render()}
+
+/* --- 作品集与科研 --- */
+function pPortfolio(){
+  var h='<div class="card"><h2>④ 作品集项目追踪</h2>'
+   +'<p class="hint">目标：4 ~ 6 个像样的项目。起源无非四种——课程作业、竞赛、科研、社会实践，最后都并进一本作品集。</p>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>项目名称</th><th>起源</th><th>开始</th><th>当前状态</th><th class="r">页数</th><th>下一步</th><th></th></tr>';
+  S.portfolio.forEach(function(p,i){
+    h+='<tr><td><input type="text" data-k="portfolio.'+i+'.name" value="'+esc(p.name)+'"></td>'
+      +'<td><select data-k="portfolio.'+i+'.type" onchange="render()">'+opts(['课程作业','竞赛','科研','社会实践','独立项目'],p.type)+'</select></td>'
+      +'<td><input type="text" data-k="portfolio.'+i+'.start" value="'+esc(p.start)+'" style="width:92px"></td>'
+      +'<td><select data-k="portfolio.'+i+'.status" onchange="render()">'+opts(['选题中','进行中','已入册','待改版','已定稿'],p.status)+'</select></td>'
+      +'<td><input type="text" data-k="portfolio.'+i+'.pages" value="'+esc(p.pages)+'" style="width:56px"></td>'
+      +'<td><input type="text" data-k="portfolio.'+i+'.next" value="'+esc(p.next)+'"></td>'
+      +'<td class="delete"><button class="delete" onclick="delArr(\'portfolio\','+i+')">×</button></td></tr>';
+  });
+  h+='</table></div><button class="sm" onclick="addP()">+ 加一个项目</button>'
+   +'<div class="sep"></div><div class="grid g3">'
+   +metric('已入册',S.portfolio.filter(function(x){return x.status==='已入册'}).length,'目标 4 ~ 6')
+   +metric('进行中',S.portfolio.filter(function(x){return x.status==='进行中'||x.status==='选题中'}).length,'')
+   +metric('总页数',S.portfolio.reduce(function(a,b){return a+(Number(b.pages)||0)},0),'')
+   +'</div></div>';
+
+  h+='<div class="card"><h2>科研进度</h2>'
+   +'<div class="row">'
+   +'<div class="field" style="flex:1;min-width:200px"><span class="t">本周读了几篇论文（目标 2 ~ 3 篇/周）</span><input type="text" data-k="weekly" value="'+esc(S.weekly)+'"></div>'
+   +'<div style="flex:2;min-width:240px"><span class="t">读哪些：北核 / SCD / AMI / A&HCI；方向优先选「梦校方向 + 梦导方向」</span><input type="text" value="边读边写，带着问题读，别间断，给自己定 DDL" disabled></div>'
+   +'</div>'
+   +'<div class="note">每周记一下数字就好，年底能看出积累曲线。科研不是少数人的事——任何普通人都能从「领域调研 + 文献精读 + 汇报 PPT」这套流程走一遍。</div>'
+   +'<div class="sep"></div><h3>科研四步路径</h3>'
+   +'<div class="row">'
+   +'<div class="metric" style="flex:1;min-width:180px"><div class="lb">第一步 · 领域调研</div><div style="font-size:13px">想去的学校 / 想跟的导师，针对性看论文与会议</div></div>'
+   +'<div class="metric" style="flex:1;min-width:180px"><div class="lb">第二步 · 文献精读</div><div style="font-size:13px">整理表、做汇报 PPT，先跑通流程</div></div>'
+   +'<div class="metric" style="flex:1;min-width:180px"><div class="lb">第三步 · 项目实践</div><div style="font-size:13px">数据收集、处理、分析、图表绘制，适应组会</div></div>'
+   +'<div class="metric" style="flex:1;min-width:180px"><div class="lb">第四步 · 再调研</div><div style="font-size:13px">视角 / 理论 / 方法创新 + 人工智能交叉</div></div>'
+   +'</div></div>';
+  return h;
+}
+function addP(){S.portfolio.push({id:uid(),name:'',type:'课程作业',start:'',end:'',status:'选题中',pages:0,next:'',done:false});render()}
+
+/* --- 时间轴与材料 --- */
+function pPlan(){
+  var c=calc();
+  var byG={};S.timeline.forEach(function(x){(byG[x.g]=byG[x.g]||[]).push(x)});
+  var h='<div class="card"><h2>⑤ 大一大二大三 · 该干嘛</h2><p class="hint">点一下就勾上，进度会回到「总览」。</p>';
+  ['大一','大二','大三'].forEach(function(g){
+    var list=byG[g]||[];var d=list.filter(function(x){return x.done}).length;
+    h+='<div class="sep"></div><h3>'+g+'　<span class="pill">'+d+' / '+list.length+'</span></h3>'
+      +'<div class="bar"><i style="width:'+(list.length?Math.round(d/list.length*100):0)+'%"></i></div>'
+      +'<ul class="ck" style="margin-top:8px">'+list.map(function(x){
+          return '<li><input type="checkbox" data-ck="timeline" data-id="'+x.id+'"'+(x.done?' checked':'')+'><span class="'+(x.done?'chk-ok':'')+'">'+esc(x.t)+'</span></li>';
+        }).join('')+'</ul>';
+  });
+  h+='</div>';
+
+  h+='<div class="card"><h2>夏令营 / 预推免材料清单</h2><p class="hint">材料讲究「早盖章」——成绩单、排名证明这些，务必在大三上学期就去开，别等到报名系统开了才发现要排队。</p>';
+  var byM={};S.materials.forEach(function(x){(byM[x.g]=byM[x.g]||[]).push(x)});
+  ['必选','建议'].forEach(function(g){
+    var list=byM[g]||[];var d=list.filter(function(x){return x.done}).length;
+    h+='<div class="sep"></div><h3>'+g+'　<span class="pill">'+d+' / '+list.length+'</span></h3>'
+      +'<ul class="ck">'+list.map(function(x){
+          return '<li><input type="checkbox" data-ck="material" data-id="'+x.id+'"'+(x.done?' checked':'')+'><span class="'+(x.done?'chk-ok':'')+'">'+esc(x.t)+(x.note?'　<span class="hint">'+esc(x.note)+'</span>':'')+'</span></li>';
+        }).join('')+'</ul>';
+  });
+  h+='<div class="note">整理成一个带目录的 PDF 最稳。简历可以多做几版，投不同学校、发给不同导师，侧重点不一样。</div></div>';
+
+  h+='<div class="card"><h2>关于焦虑</h2>'
+   +'<div class="quote">别人乘着游轮才抵达，你划着一叶独木舟也敢到这里。<small>——你是靠一块木板也能漂浮的人</small></div>'
+   +'<div class="quote">自信冷静是保研的第七件神装。<small>——选择与努力同样重要</small></div>'
+   +'</div>';
+  return h;
+}
+
+/* --- 投递看板 --- */
+function pApply(){
+  var h='<div class="card"><h2>⑥ 投递看板</h2>'
+   +'<p class="hint">夏令营基本被拒是常态，7-8 月别停。海投 + 复盘，才是预推免的胜负手。</p>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>院校</th><th>学院</th><th>专业方向</th><th>投递日期</th><th>入营</th><th>结果</th><th>面试形式</th><th>被问到的题</th><th></th></tr>';
+  S.apply.forEach(function(a,i){
+    h+='<tr><td><input type="text" data-k="apply.'+i+'.school" value="'+esc(a.school)+'"></td>'
+      +'<td><input type="text" data-k="apply.'+i+'.college" value="'+esc(a.college)+'"></td>'
+      +'<td><input type="text" data-k="apply.'+i+'.major" value="'+esc(a.major)+'"></td>'
+      +'<td><input type="text" data-k="apply.'+i+'.date" value="'+esc(a.date)+'" style="width:96px"></td>'
+      +'<td><select data-k="apply.'+i+'.invited" onchange="render()">'+opts(['','是','否'],a.invited===1?'是':(a.invited==='否'?'否':''))+'</select></td>'
+      +'<td><input type="text" data-k="apply.'+i+'.result" value="'+esc(a.result)+'" style="width:84px"></td>'
+      +'<td><input type="text" data-k="apply.'+i+'.form" value="'+esc(a.form)+'"></td>'
+      +'<td><input type="text" data-k="apply.'+i+'.q" value="'+esc(a.q)+'"></td>'
+      +'<td class="delete"><button class="delete" onclick="delArr(\'apply\','+i+')">×</button></td></tr>';
+  });
+  h+='</table></div><button class="sm" onclick="addA()">+ 加一所</button>'
+   +'<div class="sep"></div><div class="grid g4">'
+   +metric('已投递',calc().applied,'所')
+   +metric('入营',calc().invited,'所')
+   +metric('命中率',(calc().applied?Math.round(calc().invited/calc().applied*100):0)+'%','入营 / 投递')
+   +metric('面试复盘',S.apply.filter(function(x){return x.q}).length,'条已记录')
+   +'</div>'
+   +'<div class="note">结果分四种处理：优营且是梦校就安心；优营但不是梦校继续冲；入营没优营就猛练模拟面试；完全没入营也别气馁，直接进预推免。进组学习、实习、旅游都算正当安排。</div></div>';
+  return h;
+}
+function addA(){S.apply.push({id:uid(),school:'',college:'',major:'',date:'',invited:'',result:'',form:'',q:''});render()}
+
+/* ============ 成绩单导入 ============ */
+function tcPick(){ var el=document.getElementById('tcFile'); if(el) el.click(); }
+function loadPdfJs(){
+  return new Promise(function(res,rej){
+    if(window.pdfjsLib) return res(true);
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+    s.onload=function(){ res(true); };
+    s.onerror=function(){ rej(new Error('cdn')); };
+    document.head.appendChild(s);
+  });
+}
+function pdfToText(arr){
+  return loadPdfJs().then(function(){
+    return pdfjsLib.getDocument({data:arr}).promise.then(function(doc){
+      var n=Math.min(doc.numPages,10), jobs=[];
+      for(var i=1;i<=n;i++){
+        jobs.push(doc.getPage(i).then(function(p){return p.getTextContent();}).then(function(c){
+          var out=[],lastY=null,cur='';
+          c.items.forEach(function(it){
+            var y=Math.round(it.transform[5]);
+            if(lastY!==null&&Math.abs(y-lastY)>3){ out.push(cur.trim()); cur=''; }
+            cur+=it.str+(/\s$/.test(it.str)?'':'');
+            lastY=y;
+          });
+          if(cur.trim()) out.push(cur.trim());
+          return out.join('\n');
+        }));
+      }
+      return Promise.all(jobs).then(function(r){return r.join('\n');});
+    });
+  });
+}
+function onTcFile(ev){
+  var f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  var isPdf=/\.pdf$/i.test(f.name)||f.type==='application/pdf';
+  if(isPdf){
+    var fr0=new FileReader();
+    fr0.onload=function(){
+      var arr=new Uint8Array(fr0.result);
+      pdfToText(arr).then(function(txt){
+        window.__tcText=txt;
+        var el=document.getElementById('tcRaw'); el.value=(txt||'').slice(0,20000);
+        doParseTranscript();
+      }).catch(function(e){
+        alert('这份 PDF 没能抽出文字。\n多半是扫描件（图片版成绩单）。\n\n办法：用浏览器打开这份 PDF → Ctrl+A 复制 → 粘到下面那个框里，或者另存为 txt 再导入。');
+      });
+    };
+    fr0.readAsArrayBuffer(f);
+  }else{
+    var fr1=new FileReader();
+    fr1.onload=function(){
+      window.__tcText=String(fr1.result);
+      document.getElementById('tcRaw').value=window.__tcText.slice(0,20000);
+      doParseTranscript();
+    };
+    fr1.readAsText(f,'utf-8');
+  }
+  ev.target.value='';
+}
+function parseTranscript(raw){
+  var lines=String(raw).split('\n').map(function(s){return s.replace(/\s+/g,' ').trim();}).filter(function(s){return s.length>1;});
+  var rows=[],seen={},lastTerm='';
+  for(var i=0;i<lines.length;i++){
+    var L=lines[i].replace(/^[（(]?\d{1,2}[）).、\s]+/,'').trim();
+    if(!L||L.length>60) continue;
+    var hd=L.match(/20\d{2}\s*[-~至到]\s*\d{2,4}/);
+    if(/学期|学年|成绩单|平均|合计|总分|学号|姓名|学分绩点|总学分/.test(L)){
+      if(hd) lastTerm=hd[0];
+      continue;
+    }
+    if(hd) lastTerm=hd[0];
+    var GRP=/\d+(?:\.\d+)?(?:\s+\d+(?:\.\d+)?){1,3}/g, gm, prev=0;
+    while((gm=GRP.exec(L))!==null){
+      var seg=gm[0], si2=gm.index;
+      var nums=(seg.match(/\d+(?:\.\d+)?/g)||[]).map(Number).filter(function(v){return v>0&&v<=100;});
+      if(nums.length<2) continue;
+      var score=null,pos=-1;
+      for(var k=nums.length-1;k>=0;k--){ if(nums[k]>=40&&nums[k]<=100&&nums[k]>=(score||0)){score=nums[k];pos=k;} }
+      if(score===null||pos<1){ score=nums[nums.length-1]; pos=nums.length-1; }
+      if(pos<1) continue;
+      var credit=nums[pos-1];
+      if(credit>30&&pos>=2) credit=nums[pos-2];
+      if(credit<=0||credit>30) continue;
+      var raw=L.slice(prev,si2).replace(/\s+/g,' ').trim();
+      prev=si2+seg.length;
+      var name=raw.replace(/\d+(?:\.\d+)?/g,' ').replace(/[（(]\s*[）)]/g,'').replace(/\s+/g,' ').trim();
+      name=name.replace(/^[\s\d.\-–—~:：,，、]+/,'').replace(/[，,、;；:：|]+$/,'');
+      if(name.length<2) continue;
+      if(/^(课程|序号|学分|成绩|总评|平均|学期|学年|合计|专业|类别|编号|名称|总学)$/.test(name)) continue;
+      if(!/[\u4e00-\u9fa5A-Za-z]/.test(name)) continue;
+      var key=lastTerm+'|'+name+'|'+credit+'|'+score;
+      if(seen[key]) continue; seen[key]=1;
+      rows.push({term:lastTerm,name:name.slice(0,40),credit:credit,score:score});
+    }
+  }
+  return rows;
+}
+function doParseTranscript(){
+  var el=document.getElementById('tcRaw');
+  var txt=(el&&el.value)||window.__tcText||'';
+  if(!txt.trim()){ alert('先把成绩单文字弄进来：选 PDF，或者把文字粘到框里。'); return; }
+  var rows=parseTranscript(txt);
+  if(!rows.length){
+    document.getElementById('tcOut').innerHTML='<div class="note">没识别出行。常见原因：这份是扫描件（复制不出文字）、或者一行里有好几个日期数字混在一起。试试手动复制几行粘进来。</div>';
+    return;
+  }
+  window.__tc=rows;
+  var h='<h3>识别到 '+rows.length+' 门课（核对一下再导入）</h3>'
+   +'<div class="tbwrap"><table class="tb"><tr><th>学期</th><th>课程</th><th class="r">学分</th><th class="r">成绩</th><th class="r">绩点</th><th></th></tr>';
+  rows.forEach(function(r,i){
+    h+='<tr><td><input type="text" value="'+esc(r.term)+'" oninput="tcSet('+i+',\'term\',this.value)" style="width:120px"></td>'
+      +'<td><input type="text" value="'+esc(r.name)+'" oninput="tcSet('+i+',\'name\',this.value)"></td>'
+      +'<td><input type="text" value="'+r.credit+'" oninput="tcSet('+i+',\'credit\',this.value)" style="width:56px"></td>'
+      +'<td><input type="text" value="'+r.score+'" oninput="tcSet('+i+',\'score\',this.value)" style="width:56px"></td>'
+      +'<td id="tcG'+i+'"></td>'
+      +'<td class="delete"><button class="delete" onclick="tcDel('+i+')">×</button></td></tr>';
+  });
+  h+='</table></div><div class="row" style="margin-top:10px">'
+   +'<button class="pri" onclick="confirmImportCourses()">确认导入（'+rows.length+' 门）</button>'
+   +'<button onclick="document.getElementById(\'tcOut\').innerHTML=\'\'">取消</button>'
+   +'<span class="hint">重复的同名课程会自动跳过。</span></div>';
+  document.getElementById('tcOut').innerHTML=h;
+  updateDerived();
+  var box=document.getElementById('tcOut');
+  for(var i2=0;i2<rows.length;i2++){ var e=box.querySelector('#tcG'+i2); if(e) e.textContent=f1(gpaOf(rows[i2].score)); }
+}
+function tcSet(i,k,v){ if(!window.__tc[i])return; window.__tc[i][k]=v; }
+function tcDel(i){ if(!window.__tc)return; window.__tc.splice(i,1); doParseTranscript(); }
+function confirmImportCourses(){
+  if(!window.__tc||!window.__tc.length) return;
+  var add=0,skip=0;
+  window.__tc.forEach(function(r){
+    var dup=S.courses.some(function(c){return c.name===r.name&&c.term===r.term;});
+    if(dup){ skip++; return; }
+    S.courses.push({id:uid(),term:r.term,name:r.name,credit:Number(r.credit)||0,score:Number(r.score)||0});
+    add++;
+  });
+  window.__tc=[]; save(); render();
+  alert('导入完成：新增 '+add+' 门'+(skip?('，跳过重复 '+skip+' 门'):'')+'。');
+}
+
+/* ============ 派生数值刷新 ============ */
+function updateDerived(){
+  var c=calc(),i;
+  function set(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v}
+  set('o-gpa',f1(c.gpa)); set('o-study',Math.round(c.studyStd)); set('o-cn',S.courses.length);
+  set('o-credit',f1(S.courses.reduce(function(a,b){return a+(Number(b.credit)||0)},0)));
+  set('o-rs',Math.round(c.rs)); set('o-cs',Math.round(c.cs)); set('o-os',Math.round(c.os)); set('o-total',Math.round(c.total));
+  var sb=document.getElementById('sumBox'); if(sb) sb.value=buildSummary();
+  for(i=0;i<S.courses.length;i++){var e=document.getElementById('gpacell'+i);if(e)e.textContent=f1(gpaOf(S.courses[i].score));}
+  for(i=0;i<S.awards.length;i++){var e2=document.getElementById('awcell'+i);if(e2)e2.textContent=f1(awardScore(S.awards[i]));}
+}
+
+/* ============ 事件 ============ */
+function setPath(k,v){
+  var ks=k.split('.'),o=S;
+  for(var i=0;i<ks.length-1;i++)o=o[ks[i]];
+  o[ks[ks.length-1]]=v;
+}
+document.addEventListener('input',function(e){
+  var k=e.target.getAttribute('data-k'); if(!k)return;
+  setPath(k,e.target.value); save(); updateDerived();
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.getAttribute('data-ck')){
+    var id=t.getAttribute('data-id'), arr=t.getAttribute('data-ck');
+    for(var i=0;i<S[arr].length;i++){ if(S[arr][i].id===id){S[arr][i].done=t.checked;break;} }
+    save(); render(); return;
+  }
+});
+function delArr(name,i){
+  var list=S[name].filter(function(_,idx){return idx!==i});
+  S[name]=list;
+  if(name==='tiers'){ S.awards.forEach(function(a){ if(!tierOf(a.tierId)) a.tierId=''; }); }
+  save(); render();
+}
+
+/* ============ 存储 ============ */
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function load(){
+  try{var r=localStorage.getItem(KEY); if(r){S=JSON.parse(r);
+    if(!S.policies||!S.policies.length){
+      var d=blankState();
+      S.policies=d.policies; S.curPolicyId=d.curPolicyId;
+      if(!S.tiers||!S.tiers.length) S.tiers=d.tiers;
+      if(!S.weights||!S.weights.study) S.weights=d.weights;
+      if(!S.gpaMap||!S.gpaMap.length) S.gpaMap=d.gpaMap;
+    }
+    if(!S.curPolicyId) S.curPolicyId=S.policies[0].id;
+    save(); return;}}catch(e){}
+  S=blankState();S.demo=false;save();
+}
+function clearAll(){if(!confirm('会清空当前所有数据（包括示例）。确定？'))return;S=blankState();save();render();}
+function loadDemo(){if(!confirm('载入示例数据（上岸学姐的公开经历）。覆盖当前内容？'))return;S=demoState();save();render();}
+function loadPreset(kind){
+  if(kind==='nfu'){
+    if(!confirm('载入「南京林业大学 2024 版」政策模板：学业70% / 科研10% / 竞赛15% / 其他5%，并补齐常用加分档位。将覆盖当前加分档位表，确定？'))return;
+    S.tiers=defTiers();
+    S.weights={study:70,research:10,contest:15,other:5};
+    save();render();
+  }else{
+    if(!confirm('清空成绩、加分、作品集、材料记录，只保留空的规则表？'))return;
+    var old={meta:S.meta,weights:S.weights,gpaMap:S.gpaMap,tiers:S.tiers};
+    S=blankState();S.meta=old.meta;S.weights=old.weights;S.gpaMap=old.gpaMap;S.tiers=old.tiers;
+    save();render();
+    alert('已清空。现在去「② 成绩与绩点」把你的成绩单录进来。');
+  }
+}
+function exportJSON(){
+  var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='设计保研工作台-备份-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+load(); render();
+</script>
+</body>
+</html>
