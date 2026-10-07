@@ -2,7 +2,8 @@
 
 一个给设计类本科生用的保研自我管理工具。**单文件 HTML，零依赖，双击即用，离线可跑，数据不出本机。**
 
-作者：小红书 [@发展中设计师](https://www.xiaohongshu.com/user/profile/6050b52e000000000100903f)
+🌐 在线版（不用下载，浏览器直接打开）：
+https://gaocrypto123.github.io/design-baoyan-workbench/
 
 ![预览](assets/preview-1.png)
 
@@ -96,8 +97,6 @@
 
 MIT。可以随便改、随便用，但请保留原作者署名。
 
-## 作者
 
-·小红书 [@发展中设计师](https://www.xiaohongshu.com/user/profile/6050b52e000000000100903f)
 
-如果这个项目帮到了你，或者你想聊聊设计生怎么做自己的小工具，欢迎在小红书找我。
+如果这个项目帮到了你，或者你想聊聊设计生怎么做自己的小工具，欢迎通过邮箱找我。
